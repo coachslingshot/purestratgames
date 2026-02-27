@@ -1,47 +1,59 @@
-const PLATFORM_API_URL = process.env.PLATFORM_API_URL || 'http://localhost:4000';
-
-export async function fetchPlatform(path: string, options: RequestInit = {}) {
-    const res = await fetch(`${PLATFORM_API_URL}${path}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        },
-    });
-
-    if (!res.ok) {
-        const error = await res.json().catch(() => ({ error: 'Unknown error' }));
-        throw new Error(error.error || `Platform API error: ${res.status}`);
-    }
-
-    return res.json();
-}
+/**
+ * Platform API client for the PureStrat Portal.
+ * These methods call the local /api routes which now handle the 
+ * direct interaction with Supabase.
+ */
 
 export const platformApi = {
-    getProfile: (userId: string, token: string) =>
-        fetchPlatform(`/users/${userId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }),
+    /**
+     * Fetches the consolidated profile payload for a user.
+     */
+    async getProfile(userId: string) {
+        const res = await fetch(`/api/profile/${userId}`);
+        if (!res.ok) throw new Error('Failed to fetch profile');
+        return res.json();
+    },
 
-    updateProfile: (userId: string, token: string, data: { username?: string; avatar_url?: string }) =>
-        fetchPlatform(`/users/${userId}`, {
+    /**
+     * Updates the current user's profile.
+     */
+    async updateProfile(userId: string, data: { username?: string; avatar_url?: string }) {
+        const res = await fetch(`/api/profile/${userId}`, {
             method: 'PATCH',
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
-        }),
+        });
+        if (!res.ok) throw new Error('Failed to update profile');
+        return res.json();
+    },
 
-    getFriends: (userId: string, token: string) =>
-        fetchPlatform(`/users/${userId}/friends`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }),
+    /**
+     * Fetches leaderboard data.
+     * If gameId is omitted, returns the global leaderboard.
+     */
+    async getLeaderboard(gameId?: string) {
+        const url = gameId ? `/api/leaderboard?gameId=${gameId}` : '/api/leaderboard';
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Failed to fetch leaderboard');
+        return res.json();
+    },
 
-    getCurrency: (userId: string, token: string) =>
-        fetchPlatform(`/users/${userId}/currency`, {
-            headers: { Authorization: `Bearer ${token}` }
-        }),
+    /**
+     * Fetches the current user's rival list.
+     */
+    async getFriends() {
+        const res = await fetch('/api/friends');
+        if (!res.ok) throw new Error('Failed to fetch friends');
+        return res.json();
+    },
 
-    getLeaderboard: (token: string, gameId?: string) =>
-        fetchPlatform(gameId ? `/leaderboard/${gameId}` : '/leaderboard', {
-            headers: { Authorization: `Bearer ${token}` }
-        }),
+    /**
+     * Fetches the current user's currency balance.
+     */
+    async getBalance() {
+        const res = await fetch('/api/currency');
+        if (!res.ok) throw new Error('Failed to fetch balance');
+        const data = await res.json();
+        return data.balance || 0;
+    }
 };
