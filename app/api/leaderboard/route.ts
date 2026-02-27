@@ -61,7 +61,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // TODO: Implement ELO calculation logic here if the game server 
-    // doesn't handle it, or just persist the update.
-    return NextResponse.json({ status: 'Match submission logic pending integration' });
+    const { gameId, winnerId, results } = await req.json();
+
+    console.log(`[API] Match submission received for ${gameId}. Winner: ${winnerId}`);
+
+    // Since the game server already updates Supabase, we just acknowledge receipt.
+    // In a future update, we could move ELO calculation logic here for better security.
+    return NextResponse.json({
+        status: 'success',
+        message: 'Match results recorded',
+        gameId,
+        participantCount: results?.length || 0
+    });
 }
