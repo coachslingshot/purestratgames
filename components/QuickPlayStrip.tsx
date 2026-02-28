@@ -2,6 +2,8 @@
 
 import Image from 'next/image';
 
+const DUALSUIT_URL = process.env.NEXT_PUBLIC_DUALSUIT_URL ?? 'http://localhost:5173';
+
 export default function QuickPlayStrip() {
     return (
         <div className="flex items-center gap-8 mb-12">
@@ -38,7 +40,7 @@ export default function QuickPlayStrip() {
 
             {/* DualSuit Jujitsu — live */}
             <a
-                href="http://localhost:5173"
+                href={DUALSUIT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex flex-col items-center gap-2 group"

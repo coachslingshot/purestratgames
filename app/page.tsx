@@ -4,6 +4,8 @@ import LeaderboardStrip from '@/components/LeaderboardStrip';
 import Footer from '@/components/Footer';
 import QuickPlayStrip from '@/components/QuickPlayStrip';
 
+const DUALSUIT_URL = process.env.NEXT_PUBLIC_DUALSUIT_URL ?? 'http://localhost:5173';
+
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col" style={{ color: '#F4F4F5' }}>
@@ -112,7 +114,7 @@ export default function Home() {
               subtitle="Heightened 26 Card Combat"
               description="For 2 to 5 players. Balance aggression and defense through perfect pattern play. A deterministic card duel built entirely on anticipation and precision."
               status="live"
-              href="http://localhost:5173"
+              href={DUALSUIT_URL}
               motif="🃏"
               imageSrc="/dualsuit-jujitsu-logo.png"
             />
